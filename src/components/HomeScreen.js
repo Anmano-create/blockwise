@@ -7,8 +7,16 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ThemedView from "../components/ThemedView.js";
+import { useTheme } from "../context/ThemeContext.js";
 
-export const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => {
+  const { dark, fontScale } = useTheme();
+  const bg = dark ? "#121212" : "#E2F9DB";
+  const card = dark ? "#1e1e1e" : "#fff";
+  const txt = dark ? "#fff" : "#000";
+  const sub = dark ? "#aaa" : "#333";
+
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [infoVisible, setInfoVisible] = useState(false);
@@ -19,7 +27,6 @@ export const HomeScreen = ({ navigation }) => {
       duration: 1500,
       useNativeDriver: true,
     }).start();
-
     setTimeout(() => {
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -27,132 +34,115 @@ export const HomeScreen = ({ navigation }) => {
         useNativeDriver: true,
       }).start();
     }, 1000);
-  }, [slideAnim, fadeAnim]);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.titleContainer,
-          { transform: [{ translateY: slideAnim }] },
-        ]}
-      >
-        <Text style={styles.title}>Welcome to BlockWise!</Text>
-      </Animated.View>
-
-      <Ionicons
-        name="school-outline"
-        size={80}
-        color="#333"
-        style={styles.centerIcon}
-      />
-
-      <Animated.Text style={[styles.subtitle, { opacity: fadeAnim }]}>
-        Choose an option to continue
-      </Animated.Text>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Login")}
+    <ThemedView>
+      <View style={[st.container, { backgroundColor: bg }]}>
+        <Animated.View
+          style={[st.titleWrap, { transform: [{ translateY: slideAnim }] }]}
         >
-          <Ionicons name="log-in-outline" size={20} color="#333" />
-          <Text style={styles.buttonText}>Log In</Text>
-        </TouchableOpacity>
+          <Text style={[st.title, { color: txt, fontSize: 28 * fontScale }]}>
+            Welcome to BlockWise!
+          </Text>
+        </Animated.View>
 
-        <View style={{ position: "relative" }}>
+        <Ionicons name="school-outline" size={80} color={txt} style={st.icon} />
+
+        <Animated.Text
+          style={[
+            st.sub,
+            { color: sub, opacity: fadeAnim, fontSize: 16 * fontScale },
+          ]}
+        >
+          Choose an option to continue
+        </Animated.Text>
+
+        <View style={st.btnWrap}>
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Signup")}
+            style={[st.btn, { backgroundColor: card }]}
+            onPress={() => navigation.navigate("Login")}
           >
-            <Ionicons name="person-add-outline" size={20} color="#333" />
-            <Text style={styles.buttonText}>Create Account</Text>
-
-            <TouchableOpacity
-              onPress={() => setInfoVisible(!infoVisible)}
-              style={styles.infoIconBtn}
-            >
-              <Ionicons
-                name="information-circle-outline"
-                size={18}
-                color="#666"
-              />
-            </TouchableOpacity>
+            <Ionicons name="log-in-outline" size={20} color={txt} />
+            <Text style={[st.btnTxt, { color: txt, fontSize: 16 * fontScale }]}>
+              Log In
+            </Text>
           </TouchableOpacity>
 
-          {infoVisible && (
-            <View style={styles.infoBox}>
-              <Text style={styles.infoBoxText}>
-                By creating an account, you can save your preferences, earn more
-                points for reading about issues and access more features!
+          <View>
+            <TouchableOpacity
+              style={[st.btn, { backgroundColor: card }]}
+              onPress={() => navigation.navigate("Signup")}
+            >
+              <Ionicons name="person-add-outline" size={20} color={txt} />
+              <Text
+                style={[st.btnTxt, { color: txt, fontSize: 16 * fontScale }]}
+              >
+                Create Account
               </Text>
-            </View>
-          )}
-        </View>
+              <TouchableOpacity
+                onPress={() => setInfoVisible(!infoVisible)}
+                style={st.infoBtn}
+              >
+                <Ionicons
+                  name="information-circle-outline"
+                  size={18}
+                  color={sub}
+                />
+              </TouchableOpacity>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Categories")}
-        >
-          <Ionicons name="walk-outline" size={20} color="#333" />
-          <Text style={styles.buttonText}>Continue as guest</Text>
-        </TouchableOpacity>
+            {infoVisible && (
+              <View style={[st.infoBox, { backgroundColor: card }]}>
+                <Text
+                  style={[st.infoTxt, { color: txt, fontSize: 14 * fontScale }]}
+                >
+                  By creating an account, you can save your preferences, earn
+                  more points for reading about issues and access more features!
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={[st.btn, { backgroundColor: card }]}
+            onPress={() => navigation.navigate("Categories")}
+          >
+            <Ionicons name="walk-outline" size={20} color={txt} />
+            <Text style={[st.btnTxt, { color: txt, fontSize: 16 * fontScale }]}>
+              Continue as guest
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ThemedView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#E2F9DB",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  titleContainer: {},
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  centerIcon: {
-    marginVertical: 20,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 40,
-  },
-  buttonContainer: {
-    width: "80%",
-  },
-  button: {
+const st = StyleSheet.create({
+  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  titleWrap: {},
+  title: { fontWeight: "bold", marginBottom: 4 },
+  icon: { marginVertical: 20 },
+  sub: { marginBottom: 40 },
+  btnWrap: { width: "80%" },
+  btn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
     padding: 12,
     marginVertical: 6,
     borderRadius: 8,
   },
-  buttonText: {
-    marginLeft: 8,
-    fontSize: 16,
-  },
-  infoIconBtn: {
-    marginLeft: "auto",
-  },
+  btnTxt: { marginLeft: 8 },
+  infoBtn: { marginLeft: "auto" },
   infoBox: {
     marginTop: 4,
-    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 6,
-    borderColor: "#ccc",
     borderWidth: 1,
+    borderColor: "#666",
   },
-  infoBoxText: {
-    fontSize: 14,
-    color: "#333",
-    lineHeight: 18,
-  },
+  infoTxt: { lineHeight: 18 },
 });
 
 export default HomeScreen;

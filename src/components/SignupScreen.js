@@ -15,8 +15,16 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
+import ThemedView from "../components/ThemedView.js";
+import { useTheme } from "../context/ThemeContext.js";
 
-export const SignupScreen = ({ navigation }) => {
+const SignupScreen = ({ navigation }) => {
+  const { dark, fontScale } = useTheme();
+  const bg = dark ? "#121212" : "#E2F9DB";
+  const card = dark ? "#1e1e1e" : "#fff";
+  const txt = dark ? "#fff" : "#000";
+  const sub = dark ? "#999" : "#333";
+
   const [email, setEmail] = useState("");
   const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +32,7 @@ export const SignupScreen = ({ navigation }) => {
   const [error, setError] = useState("");
 
   const handleCreate = async () => {
-    if (email.trim() === "" || password.trim() === "") {
+    if (!email || !password) {
       setError("All fields are required.");
       return;
     }
@@ -49,118 +57,120 @@ export const SignupScreen = ({ navigation }) => {
     ]);
   };
 
+  const Input = ({ icon, placeholder, value, onChange, secure = false }) => (
+    <View style={[st.inputRow, { backgroundColor: card }]}>
+      <Ionicons name={icon} size={20} color={sub} style={{ marginRight: 6 }} />
+      <TextInput
+        style={[st.inputField, { color: txt }]}
+        placeholder={placeholder}
+        placeholderTextColor={sub}
+        secureTextEntry={secure}
+        autoCapitalize="none"
+        value={value}
+        onChangeText={onChange}
+      />
+    </View>
+  );
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TouchableOpacity
-            style={styles.goBack}
-            onPress={() => navigation.goBack()}
+    <ThemedView>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={[st.container, { backgroundColor: bg }]}
+            keyboardShouldPersistTaps="handled"
           >
-            <Ionicons name="arrow-back" size={24} color="#333" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={st.back}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={24} color={txt} />
+            </TouchableOpacity>
 
-          <Text style={styles.title}>BlockWise</Text>
+            <Text style={[st.title, { color: txt, fontSize: 26 * fontScale }]}>
+              BlockWise
+            </Text>
+            <Ionicons
+              name="school-outline"
+              size={80}
+              color={txt}
+              style={st.icon}
+            />
 
-          <Ionicons
-            name="school-outline"
-            size={80}
-            color="#333"
-            style={styles.icon}
-          />
+            <Input
+              icon="mail-outline"
+              placeholder="Email Address"
+              value={email}
+              onChange={setEmail}
+            />
+            <Input
+              icon="mail-outline"
+              placeholder="Confirm Email Address"
+              value={confirmEmail}
+              onChange={setConfirmEmail}
+            />
+            <Input
+              icon="lock-closed-outline"
+              placeholder="Password"
+              secure
+              value={password}
+              onChange={setPassword}
+            />
+            <Input
+              icon="lock-closed-outline"
+              placeholder="Confirm Password"
+              secure
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
 
-          <Input
-            icon="mail-outline"
-            placeholder="Email"
-            value={email}
-            onChange={setEmail}
-            keyboardType="email-address"
-          />
-          <Input
-            icon="mail-outline"
-            placeholder="Confirm Email"
-            value={confirmEmail}
-            onChange={setConfirmEmail}
-            keyboardType="email-address"
-          />
-          <Input
-            icon="lock-closed-outline"
-            placeholder="Password"
-            value={password}
-            onChange={setPassword}
-            secure
-          />
-          <Input
-            icon="lock-closed-outline"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            secure
-          />
+            {error !== "" && (
+              <Text style={[st.error, { fontSize: 13 * fontScale }]}>
+                {error}
+              </Text>
+            )}
 
-          {error !== "" && <Text style={styles.error}>{error}</Text>}
-
-          <TouchableOpacity style={styles.createBtn} onPress={handleCreate}>
-            <Text style={styles.createText}>Create Account</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+            <TouchableOpacity style={st.createBtn} onPress={handleCreate}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontSize: 16 * fontScale,
+                  fontWeight: "600",
+                }}
+              >
+                Create Account
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ThemedView>
   );
 };
 
-const Input = ({
-  icon,
-  placeholder,
-  value,
-  onChange,
-  secure = false,
-  keyboardType = "default",
-}) => (
-  <View style={styles.inputRow}>
-    <Ionicons name={icon} size={20} color="#666" style={{ marginRight: 6 }} />
-    <TextInput
-      style={styles.inputField}
-      placeholder={placeholder}
-      placeholderTextColor="#999"
-      value={value}
-      onChangeText={onChange}
-      secureTextEntry={secure}
-      keyboardType={keyboardType}
-      autoCapitalize="none"
-    />
-  </View>
-);
-
-const styles = StyleSheet.create({
-  flex: { flex: 1 },
+const st = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#E2F9DB",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 80,
   },
-  goBack: { position: "absolute", top: 50, left: 20 },
-  title: { fontSize: 26, fontWeight: "bold", marginTop: 10 },
+  back: { position: "absolute", top: 50, left: 20 },
+  title: { fontWeight: "bold", marginTop: 10 },
   icon: { marginVertical: 20 },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 10,
     height: 48,
     marginVertical: 8,
   },
-  inputField: { flex: 1, color: "#333" },
+  inputField: { flex: 1 },
   error: { color: "red", marginTop: 4 },
   createBtn: {
     width: "100%",
@@ -170,7 +180,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "center",
   },
-  createText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });
 
 export default SignupScreen;
