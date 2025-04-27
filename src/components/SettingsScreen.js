@@ -31,7 +31,7 @@ const SettingsScreen = () => {
     const u = await AsyncStorage.getItem("current_user");
     if (u) {
       await AsyncStorage.multiRemove([
-        "current_user", // keep prefs_<user>
+        "current_user",
         `saved_${u.toLowerCase()}`,
       ]);
     }
@@ -40,8 +40,8 @@ const SettingsScreen = () => {
 
   const clearSaved = async () => {
     const u = await AsyncStorage.getItem("current_user");
-    if (!u) return;
-    await AsyncStorage.removeItem(`saved_${u.toLowerCase()}`);
+    const key = u ? u.toLowerCase() : "guest";
+    await AsyncStorage.removeItem(`saved_${key}`);
     Alert.alert("Done", "Saved articles cleared");
   };
 
@@ -150,13 +150,9 @@ const SettingsScreen = () => {
         />
       </View>
 
-      {!isGuest && (
-        <>
-          <Section title="Data & Privacy" />
-          <Row label="Clear Saved Articles" onPress={confirmClear} />
-          <Row label="Delete Account" onPress={confirmDelete} />
-        </>
-      )}
+      <Section title="Data & Privacy" />
+      <Row label="Clear Saved Articles" onPress={confirmClear} />
+      {!isGuest && <Row label="Delete Account" onPress={confirmDelete} />}
 
       <Section title="About" />
       <Row label="About & Licenses" onPress={() => nav.navigate("About")} />
