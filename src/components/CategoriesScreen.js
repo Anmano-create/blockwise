@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ThemedView from "../components/ThemedView.js";
-import { useTheme } from "../context/ThemeContext.js";
+import ThemedView from "../components/ThemedView";
+import { useTheme } from "../context/ThemeContext";
 
 const categories = [
   { id: 1, label: "Environment & Climate", color: "#4ade80" },
@@ -49,9 +49,7 @@ const CategoriesScreen = ({ navigation }) => {
     );
 
   const handleGo = async () => {
-    if (userKey !== "guest") {
-      await AsyncStorage.setItem(`prefs_${userKey}`, JSON.stringify(selected));
-    }
+    await AsyncStorage.setItem(`prefs_${userKey}`, JSON.stringify(selected));
     navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
   };
 
@@ -72,7 +70,7 @@ const CategoriesScreen = ({ navigation }) => {
           Pick any topics that resonate with you
         </Text>
 
-        {userKey !== "guest" && (
+        {userKey === "guest" && (
           <Text style={[st.note, { color: sub, fontSize: 12 * fontScale }]}>
             Already have an account? Press “Skip” to continue
           </Text>

@@ -1,0 +1,3 @@
+export const NEWS_KEY = "30da0a05f8924da6a08be324dc38761e";
+export const OPENAI_KEY =
+  "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";
